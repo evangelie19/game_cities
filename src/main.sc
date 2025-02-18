@@ -5,7 +5,7 @@ require: city/city.sc
 
 theme: /
 
-    state: Start || modal = true
+    state: start || modal = true
         q!: $regex</start>
         intent!: /LetsPlay
         script:
@@ -25,12 +25,11 @@ theme: /
 
         state: Computer
             intent: /computer
+            a: Бот загадывает город...
             script:
                 $session.keys = Object.keys($Cities);
-                var city = $Cities[chooseRandCityKey($session.keys)].value.name
-                $reactions.answer(city)
-                $session.prevBotCity = city
-
+                var city = $Cities[chooseRandCityKey($session.keys)];
+                $session.prevBotCity = city;
             go!: /LetsPlayCitiesGame
 
         state: LocalCatchAll
@@ -38,28 +37,36 @@ theme: /
             a: Это не похоже на ответ. Попробуйте еще раз.
 
     state: LetsPlayCitiesGame
+        script:
+            if ($session.prevBotCity != 0) {
+                $reactions.answer("Игра началась!");
+            }
         state: CityPattern
             q: * $City *
             script:
                 if (isAFullNameOfCity()) {
                     if (checkLetter($parseTree._City.name, $session.prevBotCity) == true
-                    || $session.prevBotCity == 0) {
-                    var removeCity = findByName($parseTree._City.name, $session.keys, $Cities)
+                        || $session.prevBotCity == 0) {
+                        var removeCity = findByName($parseTree._City.name, $session.keys, $Cities);
 
-                    if (checkCity($parseTree, $session.keys, $Cities) == true) {
-                        $session.keys.splice(removeCity, 1)
-                        var key = responseCity($parseTree, $session.keys, $Cities)
-                        if (key == 0) {
-                            $reactions.answer("Я сдаюсь")
+                        if (checkCity($parseTree, $session.keys, $Cities) == true) {
+                            $session.keys.splice(removeCity, 1);
+                            var key = responseCity($parseTree, $session.keys, $Cities);
+                            if (key == 0) {
+                                $reactions.answer("Я сдаюсь");
+                            } else {
+                                $reactions.answer($Cities[key].value.name);
+                                $session.prevBotCity = $Cities[key].value.name;
+                                removeCity = findByName($Cities[key].value.name, $session.keys, $Cities);
+                                $session.keys.splice(removeCity, 1);
+                            }
                         } else {
-                            $reactions.answer($Cities[key].value.name)
-                            $session.prevBotCity = $Cities[key].value.name
-                            removeCity = findByName($Cities[key].value.name, $session.keys, $Cities)
-                            $session.keys.splice(removeCity, 1)
+                            $reactions.answer("Этот город уже был назван");
                         }
-                    } else $reactions.answer("Этот город уже был назван")
                     }
-                } else $reactions.answer("Используйте только полные названия городов")
+                } else {
+                    $reactions.answer("Используйте только полные названия городов");
+                }
 
         state: NoMatch
             event: noMatch
