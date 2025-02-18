@@ -9,12 +9,13 @@
     </test-case>
 
     <test-case id="2">
-        <q>/start</q>
-        <a>Привет! Предлагаю сыграть в игру "Города". Кто загадывает город: компьютер или пользователь?</a>
-        <q>не я</q>
-        <a state="/start/Computer"></a>
-        <a state="/LetsPlayCitiesGame"></a>
+    <q>/start</q>
+    <a>Привет! Предлагаю сыграть в игру "Города". Кто загадывает город: компьютер или пользователь?</a>
+    <q>не я</q>
+    <a state="/start/Computer">Бот загадывает город...</a>  <!-- ✅ Добавлен текст -->
+    <a state="/LetsPlayCitiesGame">Игра началась!</a>  <!-- ✅ Добавлен текст -->
     </test-case>
+
 
     <test-case id="3">
         <state>LetsPlayCitiesGame</state>
